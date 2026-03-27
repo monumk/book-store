@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 /**
  * @swagger
- * /api/user/addUser:
+ * /api/user/signup:
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
@@ -35,7 +35,7 @@ const jwt = require("jsonwebtoken");
  *         description: User created
  */
 
-router.post("/addUser", async (req, res) => {
+router.post("/signup", async (req, res) => {
     try {
         const { name, email, mobile, password } = req.body;
 
