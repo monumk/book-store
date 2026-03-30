@@ -36,39 +36,39 @@ const jwt = require("jsonwebtoken");
  */
 
 router.post("/signup", async (req, res) => {
-    try {
-        const { name, email, mobile, password } = req.body;
+  try {
+    const { name, email, mobile, password } = req.body;
 
-        // Validate input
-        if (!name || !email || !mobile || !password) {
-            return res.status(400).json({ msg: "All fields are required" });
-        }
-
-        // Check if user exists
-        let existingUser = await User.findOne({ email: email.toLowerCase().trim() });
-        if (existingUser) {
-            return res.status(400).json({ msg: "Email already exists" });
-        }
-
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create new user
-        const user = new User({
-            name: name.toLowerCase().trim(),
-            email: email.toLowerCase().trim(),
-            mobile: mobile.toString().trim(),
-            password: hashedPassword
-        });
-
-        await user.save();
-
-        return res.status(200).json({ msg: "User created successfully", user });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    // Validate input
+    if (!name || !email || !mobile || !password) {
+      return res.status(400).json({ msg: "All fields are required" });
     }
+
+    // Check if user exists
+    let existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+    if (existingUser) {
+      return res.status(400).json({ msg: "Email already exists" });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user
+    const user = new User({
+      name: name.toLowerCase().trim(),
+      email: email.toLowerCase().trim(),
+      mobile: mobile.toString().trim(),
+      password: hashedPassword
+    });
+
+    await user.save();
+
+    return res.status(200).json({ msg: "User created successfully", user });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /**
@@ -176,10 +176,26 @@ router.post("/login", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
+
+router.post("/getFavouriteBooks/:id", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // Find the user and populate the favouriteBookId array
+    const user = await User.findById(userId)
+      .populate("favouriteBookId"); // <-- populate replaces ObjectIds with Book docs
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.status(200).json({ favouriteBooks: user.favouriteBookId });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+})
 
 
 module.exports = router;
