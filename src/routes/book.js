@@ -54,13 +54,13 @@ router.post("/addBook", async (req, res) => {
 
         const { bookName, author, price, title, description, category, publishedDate, pages, stock } = req.body;
         const bookLowerCase = bookName.toLowerCase();
-        let book = await Book.findOne({bookName: bookLowerCase});
-        if(book){
+        let book = await Book.findOne({ bookName: bookLowerCase });
+        if (book) {
             return res.status(400).json({ msg: "Book already exists" });
         }
 
-        book = new Book ({
-            bookName:bookLowerCase,
+        book = new Book({
+            bookName: bookLowerCase,
             author,
             price,
             title,
@@ -104,12 +104,12 @@ router.post("/addBook", async (req, res) => {
  *         description: Book added successfully
  */
 
-router.post("/addFavouriteBook", async(req, res)=>{
-    try{
-        const {userId, bookId} = req.body;
+router.post("/addFavouriteBook", async (req, res) => {
+    try {
+        const { userId, bookId } = req.body;
         const user = await User.findById(userId);
 
-         // Check if the book is already in the favourites
+        // Check if the book is already in the favourites
         if (user.favouriteBookId.includes(bookId)) {
             return res.status(400).json({ msg: "Book already in favourites" });
         }
@@ -120,7 +120,7 @@ router.post("/addFavouriteBook", async(req, res)=>{
         res.status(200).json({ msg: "Favourite book added successfully", favouriteBooks: user.favouriteBookId });
 
 
-    }catch (err){
+    } catch (err) {
         res.status(500).json({ msg: "Server error", err });
     }
 })
@@ -151,29 +151,68 @@ router.post("/addFavouriteBook", async(req, res)=>{
  *         description: Book removed successfully
  */
 
-router.post("/removeFavouriteBook", async (req, res)=>{
-    try{
-        const {userId, bookId} = req.body;
+router.post("/removeFavouriteBook", async (req, res) => {
+    try {
+        const { userId, bookId } = req.body;
         const user = await User.findById(userId);
-        if(!user){
+        if (!user) {
             return res.status(400).json({ msg: "User not found" });
         }
 
         const book = await Book.findById(bookId);
-        if(!book){
+        if (!book) {
             return res.status(400).json({ msg: "Book not found" });
         }
 
         if (user.favouriteBookId.includes(bookId)) {
-             user.favouriteBookId = user.favouriteBookId.filter(
+            user.favouriteBookId = user.favouriteBookId.filter(
                 id => id.toString() !== bookId
             );
             await user.save();
             return res.status(200).json({ msg: "Book removed from favourites" });
         }
-    }catch (err){
-        res.status(500).json({ msg: "Server error", err });
+    } catch (err) {
+        res.status(500).json({ msg: err });
     }
 })
 
+
+/**
+ * @swagger
+ * /api/book/deleteBook/{id}:
+ *   delete:
+ *     summary: Delete a book by ID
+ *     tags: [Book]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: MongoDB ObjectId of the book to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Book deleted successfully
+ */
+
+router.delete("/deleteBook/:id", async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(400).json({ msg: "Book not found" });
+        }
+
+        const result = await Book.deleteOne({ _id: req.params.id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        return res.status(200).json({ msg: "Book deleted successfully" });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: err });
+    }
+})
 module.exports = router
