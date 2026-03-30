@@ -125,4 +125,55 @@ router.post("/addFavouriteBook", async(req, res)=>{
     }
 })
 
+
+/**
+ * @swagger
+ * /api/book/removeFavouriteBook:
+ *   post:
+ *     summary: Remove favourite book
+ *     tags: [Book]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - bookId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               bookId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Book removed successfully
+ */
+
+router.post("/removeFavouriteBook", async (req, res)=>{
+    try{
+        const {userId, bookId} = req.body;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).json({ msg: "User not found" });
+        }
+
+        const book = await Book.findById(bookId);
+        if(!book){
+            return res.status(400).json({ msg: "Book not found" });
+        }
+
+        if (user.favouriteBookId.includes(bookId)) {
+             user.favouriteBookId = user.favouriteBookId.filter(
+                id => id.toString() !== bookId
+            );
+            await user.save();
+            return res.status(200).json({ msg: "Book removed from favourites" });
+        }
+    }catch (err){
+        res.status(500).json({ msg: "Server error", err });
+    }
+})
+
 module.exports = router
