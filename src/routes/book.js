@@ -254,4 +254,51 @@ router.post("/getFavouriteBooks", async (req, res)=>{
         res.status(500).json({ msg: err });
     } 
 })
+
+
+/**
+ * @swagger
+ * /api/book/list:
+ *   post:
+ *     summary: Book list
+ *     tags: [Book]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - page
+ *               - limit
+ *             properties:
+ *               page:
+ *                 type: number
+ *               limit:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Book fetched successfully
+ */
+
+router.post("/list", async (req, res) => {
+    try {
+        const page = parseInt(req.body.page) || 1;
+        const limit = parseInt(req.body.limit) || 10;
+        const skip = (page - 1) * limit;
+        const driver = await Book.find({}).skip(skip).limit(limit);
+        const total = await Book.countDocuments({});
+
+        res.status(200).json({
+            msg: "Book fetched successfully",
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            list: driver
+        });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error" });
+    }
+})
 module.exports = router
