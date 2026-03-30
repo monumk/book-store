@@ -114,6 +114,12 @@ router.post("/addFavouriteBook", async (req, res) => {
             return res.status(400).json({ msg: "Book already in favourites" });
         }
 
+        const book = await Book.findById(bookId);
+        if(book){
+            book.isFavourite = true;
+            await book.save();
+        }
+
         user.favouriteBookId.push(bookId);
         await user.save();
         // res.status(200).json({ msg: "Favourite book added successfully" });
@@ -165,6 +171,8 @@ router.post("/removeFavouriteBook", async (req, res) => {
         }
 
         if (user.favouriteBookId.includes(bookId)) {
+            book.isFavourite = false;
+            await book.save();
             user.favouriteBookId = user.favouriteBookId.filter(
                 id => id.toString() !== bookId
             );

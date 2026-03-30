@@ -12,7 +12,8 @@ const bookSchema = new mongoose.Schema({
     language: { type: String, default: "English" },
     stock: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    updatedAt: { type: Date, default: Date.now },
+    isFavourite: { type: Boolean, default: false }
 })
 
 module.exports = mongoose.model("book", bookSchema)
