@@ -211,8 +211,47 @@ router.delete("/deleteBook/:id", async (req, res) => {
         return res.status(200).json({ msg: "Book deleted successfully" });
 
     } catch (err) {
-        console.log(err)
         res.status(500).json({ msg: err });
     }
+})
+
+
+/**
+ * @swagger
+ * /api/book/getFavouriteBooks:
+ *   post:
+ *     summary: Get favourite books
+ *     tags: [Book]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Books fetched successfully
+ */
+
+router.post("/getFavouriteBooks", async (req, res)=>{
+    try{
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({ message: "Book not found" });
+        }
+        const booksIds = user.favouriteBookId;
+        const books = await Book.find({
+            _id: { $in: booksIds }
+        });
+        return res.status(200).json({ list: books });
+    }   catch(err){
+        res.status(500).json({ msg: err });
+    } 
 })
 module.exports = router
