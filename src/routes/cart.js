@@ -60,9 +60,11 @@ router.post("/addCartItem", async (req, res) => {
       userId,
       bookId,
       bookName: book.bookName,
+      author: book.author,
+      image: book.image,
       amount: book.price,
       quantity: 1,
-      payment: false // fix spelling also
+      payment: false
     });
 
     await cart.save();
