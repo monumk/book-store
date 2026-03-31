@@ -126,4 +126,41 @@ router.get("/getCartItems/:id", async (req, res)=>{
   }
 })
 
+/**
+ * @swagger
+ * /api/cart/removeItem:
+ *   post:
+ *     summary: Remove cart item
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - itemId
+ *             properties:
+ *               itemId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Item deleted successfully
+ */
+
+
+router.post("/removeItem", async (req, res)=>{
+  try{
+    const { itemId } = req.body;
+    const result = await Cart.deleteOne({ _id: itemId });
+
+    if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "Item not found" });
+    }
+    return res.status(200).json({ msg: "Item deleted successfully" });
+  }catch (err){
+    return res.status(500).json({ msg: "Server error" });
+  }
+})
+
 module.exports = router
