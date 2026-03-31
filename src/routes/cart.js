@@ -112,19 +112,38 @@ router.post("/addCartItem", async (req, res) => {
  *         description: Server error
  */
 
-router.get("/getCartItems/:id", async (req, res)=>{
-  try{
+// router.get("/getCartItems/:id", async (req, res)=>{
+//   try{
+//     const userId = req.params.id;
+//     const list = await Cart.find({userId: userId});
+//     return res.status(200).json({
+//       msg: "Item fetched successfully",
+//       list: list
+//     });
+//   }catch(err){
+//     return res.status(500).json({ msg: "Server error" });
+//   }
+// })
+
+router.get("/getCartItems/:id", async (req, res) => {
+  try {
     const userId = req.params.id;
-    console.log(userId)
-    const list = await Cart.find({userId: userId});
+
+    const list = await Cart.find({ userId });
+    const updatedList = list.map(item => ({
+      ...item.toObject(),
+      totalAmount: item.amount * item.quantity
+    }));
+
     return res.status(200).json({
       msg: "Item fetched successfully",
-      list: list
+      list: updatedList
     });
-  }catch(err){
+
+  } catch (err) {
     return res.status(500).json({ msg: "Server error" });
   }
-})
+});
 
 /**
  * @swagger

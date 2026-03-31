@@ -313,4 +313,50 @@ router.post("/list", async (req, res) => {
         res.status(500).json({ msg: "Server error" });
     }
 })
+
+/**
+ * @swagger
+ * /api/book/getBook/{id}:
+ *   get:
+ *     summary: Get book by book ID
+ *     tags: [Book]
+ *     description: Fetch book
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Book ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Items fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Server error
+ */
+
+router.get("/getBook/:id", async (req, res)=>{
+    try{
+        const bookId = req.params.id;
+        const result = await Book.findById(bookId);
+        if(!result){
+            return res.status(404).json({ message: "Book not found" });
+        }
+        return res.status(200).json({ data: result });
+    }catch (err){
+        console.log(err)
+        res.status(500).json({ msg: "Server error" });
+    }
+})
 module.exports = router
