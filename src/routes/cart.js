@@ -163,4 +163,63 @@ router.post("/removeItem", async (req, res)=>{
   }
 })
 
+
+/**
+ * @swagger
+ * /api/cart/decreaseQuantity:
+ *   post:
+ *     summary: Remove quantity
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - bookId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               bookId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Item updated successfully
+ */
+
+
+router.post("/decreaseQuantity", async (req, res) => {
+  try {
+    const { userId, bookId } = req.body;
+
+    if (!userId || !bookId) {
+      return res.status(400).json({ msg: "userId and bookId are required" });
+    }
+
+    const item = await Cart.findOne({ userId, bookId });
+
+    if (!item) {
+      return res.status(404).json({ msg: "Cart item not found" });
+    }
+
+    if (item.quantity <= 1) {
+      await Cart.deleteOne({ _id: item._id });
+      return res.status(200).json({ msg: "Item removed from cart" });
+    }
+
+    item.quantity -= 1;
+    await item.save();
+
+    return res.status(200).json({
+      msg: "Quantity decreased",
+      quantity: item.quantity,
+    });
+
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+});
+
 module.exports = router
