@@ -5,6 +5,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const bookRoutes = require("./src/routes/book");
 const userRoutes = require("./src/routes/user")
+const paymentRoutes = require("./src/routes/payment")
 
 dotenv.config();
 
@@ -33,6 +34,8 @@ try {
 // Routes
 app.use("/api/book", bookRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/payment", paymentRoutes);
+
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;

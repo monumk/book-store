@@ -18,6 +18,7 @@ const User = require("../models/User");
  *             required:
  *               - bookName
  *               - author
+ *               - image
  *               - price
  *               - title
  *               - description
@@ -29,6 +30,8 @@ const User = require("../models/User");
  *               bookName:
  *                 type: string
  *               author:
+ *                 type: string
+ *               image:
  *                 type: string
  *               price:
  *                 type: number
@@ -52,7 +55,7 @@ const User = require("../models/User");
 router.post("/addBook", async (req, res) => {
     try {
 
-        const { bookName, author, price, title, description, category, publishedDate, pages, stock } = req.body;
+        const { bookName, author, image, price, title, description, category, publishedDate, pages, stock } = req.body;
         const bookLowerCase = bookName.toLowerCase();
         let book = await Book.findOne({ bookName: bookLowerCase });
         if (book) {
@@ -62,6 +65,7 @@ router.post("/addBook", async (req, res) => {
         book = new Book({
             bookName: bookLowerCase,
             author,
+            image,
             price,
             title,
             description,
