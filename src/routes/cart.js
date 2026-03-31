@@ -78,4 +78,50 @@ router.post("/addCartItem", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cart/getCartItems/{id}:
+ *   get:
+ *     summary: Get cart items by user ID
+ *     tags: [Cart]
+ *     description: Fetch all cart items for a specific user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Items fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                 list:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Server error
+ */
+
+router.get("/getCartItems/:id", async (req, res)=>{
+  try{
+    const userId = req.params.id;
+    console.log(userId)
+    const list = await Cart.find({userId: userId});
+    return res.status(200).json({
+      msg: "Item fetched successfully",
+      list: list
+    });
+  }catch(err){
+    return res.status(500).json({ msg: "Server error" });
+  }
+})
+
 module.exports = router
