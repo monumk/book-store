@@ -65,8 +65,6 @@ router.post("/create-qr", async (req, res) => {
       },
     });
 
-    console.log(qr, "-----------------------");
-
     return res.status(200).json({
       success: true,
       qr,
