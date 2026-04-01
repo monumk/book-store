@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 /**
  * @swagger
@@ -35,6 +36,32 @@ const jwt = require("jsonwebtoken");
  *         description: User created
  */
 
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "mahormk121@gmail.com",
+    pass: "ekfx melz gumf flli"
+  }
+});
+
+
+async function sendMail(userEmail){
+  const mailOptions = {
+    from: "mahormk121@gmail.com",
+    to: userEmail,
+    subject: "Your Account Created Successfully!!",
+    text: "Your Account For Book Store Created Successfully!!"
+  };
+  transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("Email sent: " + info.response);
+  }
+});
+}
+
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, mobile, password } = req.body;
@@ -63,7 +90,7 @@ router.post("/signup", async (req, res) => {
     });
 
     await user.save();
-
+    await sendMail(email.toLowerCase().trim())
     return res.status(200).json({ msg: "User created successfully", user });
 
   } catch (err) {
